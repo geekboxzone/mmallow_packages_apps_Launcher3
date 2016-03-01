@@ -47,6 +47,8 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.Interpolator;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.android.launcher3.util.LauncherEdgeEffect;
 import com.android.launcher3.util.Thunk;
@@ -126,6 +128,8 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
     private boolean mCancelTap;
 
     private int[] mPageScrolls;
+    
+    private static boolean isLowResolution = false;
 
     protected final static int TOUCH_STATE_REST = 0;
     protected final static int TOUCH_STATE_SCROLLING = 1;
@@ -233,6 +237,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
 
         setHapticFeedbackEnabled(false);
         mIsRtl = Utilities.isRtl(getResources());
+         isLowResolution = isLowResolution(context);
         init();
     }
 
@@ -244,7 +249,7 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         setDefaultInterpolator(new ScrollInterpolator());
         mCurrentPage = 0;
         mCenterPagesVertically = true;
-
+        
         final ViewConfiguration configuration = ViewConfiguration.get(getContext());
         mTouchSlop = configuration.getScaledPagingTouchSlop();
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
@@ -1752,6 +1757,10 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
                 final VelocityTracker velocityTracker = mVelocityTracker;
                 velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                 int velocityX = (int) velocityTracker.getXVelocity(activePointerId);
+               if(isLowResolution){
+                  if(velocityX < 0) velocityX = -mMaximumVelocity;
+                  if(velocityX > 0) velocityX = mMaximumVelocity;
+		}
                 final int deltaX = (int) (x - mDownMotionX);
                 final int pageWidth = getPageAt(mCurrentPage).getMeasuredWidth();
                 boolean isSignificantMove = Math.abs(deltaX) > pageWidth *
@@ -1864,6 +1873,13 @@ public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarc
         return true;
     }
 
+    private  static boolean isLowResolution(Context context) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager)
+                context.getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(metrics);
+        return metrics.heightPixels <= 600 ||  metrics.widthPixels <= 1024;
+    }
     private void resetTouchState() {
         releaseVelocityTracker();
         endReordering();
