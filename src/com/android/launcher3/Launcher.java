@@ -977,6 +977,7 @@ public class Launcher extends Activity
         // Restore the previous launcher state
         if (mOnResumeState == State.WORKSPACE) {
             showWorkspace(false);
+            showWorkspaceSearchAndHotseat();
         } else if (mOnResumeState == State.APPS) {
             boolean launchedFromApp = (mWaitingForResume != null);
             // Don't update the predicted apps if the user is returning to launcher in the apps
@@ -984,6 +985,7 @@ public class Launcher extends Activity
             // switch to another app, otherwise, if it was
             showAppsView(false /* animated */, false /* resetListToTop */,
                     !launchedFromApp /* updatePredictedApps */, false /* focusSearchBar */);
+            hideWorkspaceSearchAndHotseat();
         } else if (mOnResumeState == State.WIDGETS) {
             showWidgetsView(false, false);
         }
