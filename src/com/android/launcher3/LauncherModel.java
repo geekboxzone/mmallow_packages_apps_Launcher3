@@ -217,7 +217,13 @@ public class LauncherModel extends BroadcastReceiver
     LauncherModel(LauncherAppState app, IconCache iconCache, AppFilter appFilter) {
         Context context = app.getContext();
 
-        mAppsCanBeOnRemoveableStorage = Environment.isExternalStorageRemovable();
+        boolean removeableStorage = false;
+        try{
+		removeableStorage = Environment.isExternalStorageRemovable();
+        }catch(Exception e){
+		e.printStackTrace();
+        }
+	mAppsCanBeOnRemoveableStorage = removeableStorage;
         String oldProvider = context.getString(R.string.old_launcher_provider_uri);
         // This may be the same as MIGRATE_AUTHORITY, or it may be replaced by a different
         // resource string.
