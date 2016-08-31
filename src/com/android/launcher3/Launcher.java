@@ -986,6 +986,7 @@ public class Launcher extends Activity
             showAppsView(false /* animated */, false /* resetListToTop */,
                     !launchedFromApp /* updatePredictedApps */, false /* focusSearchBar */);
             hideWorkspaceSearchAndHotseat();
+
         } else if (mOnResumeState == State.WIDGETS) {
             showWidgetsView(false, false);
         }
@@ -2423,6 +2424,7 @@ public class Launcher extends Activity
 
         if (isAppsViewVisible()) {
             showWorkspace(true);
+            showWorkspaceSearchAndHotseat();
         } else if (isWidgetsViewVisible())  {
             showOverviewMode(true);
         } else if (mWorkspace.isInOverviewMode()) {
